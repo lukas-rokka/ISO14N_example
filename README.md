@@ -3,7 +3,7 @@ Simulating space heating use - using the the ISO14N modelling framework
 Lukas Lundström
 2019-03-02
 
-# Introduction
+## Introduction
 
 This respiratory holds code for calculating space heating use according
 to the ISO14N modelling framework presented in the paper
@@ -16,10 +16,14 @@ network is a 14 node lumped and simplified version of the ISO
 52016-1:2017 standard
 [\[2\]](https://www.iso.org/standard/65696.html "Energy Performance of Buildings - Energy Needs for Heating and Cooling, Internal Temperatures and Sensible and Latent Heat Loads - Part 1 Calculation Procedures (ISO 52016-1:2017)."),
 as illustrated in the figure bellow. Also 20 node version is included,
-where opaque building elements are splitted into 5
-planes.
+where opaque building elements are splitted into 5 planes.
 
-<img src="inst/img/ISO14N.png" title="A 14 node thermal network, a lumped version of the ISO 52016-1:2017. \label{fig1}" alt="A 14 node thermal network, a lumped version of the ISO 52016-1:2017. \label{fig1}" width="70%" style="display: block; margin: auto;" />
+<center>
+
+![14 node thermal network, a lumped version of the ISO
+52016-1:2017](inst/img/ISO14N.jpg)
+
+</center>
 
 Following libraries need to be installed and loaded:
 
@@ -60,7 +64,7 @@ test building used in the paper
 “pre\_processing.R” holds the pre-processing procedures and “helpers.R”
 holds some additional functions.
 
-# Climate data
+## Climate data
 
 The
 [ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels)
@@ -95,7 +99,7 @@ df_clim
 #> #   U10 <dbl>, tcc <dbl>, u10 <dbl>, v10 <dbl>
 ```
 
-# Pre-processing
+## Pre-processing
 
 Now, with the climate data loaded we can start running the
 pre-processing procedures. The `solarCalcISO52010` package is used to
@@ -147,7 +151,7 @@ mat_h_se <- df %>%
   as.matrix()
 ```
 
-# Running the simulation
+## Running the simulation
 
 The actual RC-network construction and simulation procedures are written
 in Stan, found in the ‘src/stan\_files/chunks/ISO52016.stan’ file. Here
@@ -238,7 +242,7 @@ df2 %>%
 
 <img src="inst/img/README-unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
-# References
+## References
 
 1.  Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019.
     “Development of a Space Heating Model Suitable for the Automated

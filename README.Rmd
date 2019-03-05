@@ -13,14 +13,15 @@ knitr::opts_chunk$set(
   fig.path = "inst/img/README-"
 )
 ```
-# Introduction
+## Introduction
 
 This respiratory holds code for calculating space heating use according to the ISO14N modelling framework presented in the paper [\[1\]][1]. Includes code to construct the thermal network, running the simulation, modelling a hydronic radiator heating system, satellite-based solar irradiance, shading, window blinds, wind- and stack-driven air leakage, and variable exterior surface heat transfer coefficients. The thermal network is a 14 node lumped and simplified version of the ISO 52016-1:2017 standard [\[2\]][2], as illustrated in the figure bellow. Also 20 node version is included, where opaque building elements are splitted into 5 planes. 
 
+<center>
 
-```{r fig1,  fig.cap = "A 14 node thermal network, a lumped version of the ISO 52016-1:2017. \\label{fig1}", out.width = "70%", fig.align = "center", echo=FALSE}
-knitr::include_graphics("inst/img/ISO14N.png")
-```
+![14 node thermal network, a lumped version of the ISO 52016-1:2017](inst/img/ISO14N.jpg)
+
+</center>
 
 Following libraries need to be installed and loaded: 
 
@@ -51,7 +52,7 @@ Rcpp::sourceCpp("src/calc_Trad_s.cpp")
 
 The "test_building.R" holds a data frame with parameters describing the test building used in the paper [\[1\]][1], "pre_processing.R" holds the pre-processing procedures and "helpers.R" holds some additional functions. 
 
-# Climate data
+## Climate data
 
 The [ERA5](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels) reanalysis climate dataset is used for meteorological data and the [CAMS](http://www.soda-pro.com/web-services/radiation/cams-radiation-service) radiation service is used for satellite-based solar irradiance data. Procedures for acquiring the climate data are not presented here (e.g. my package [camsRad](https://github.com/ropensci/camsRad) can be used to access CAMS data from R). Here we load a ready made climate file for Norrköping, Sweden:
 
@@ -63,7 +64,7 @@ df_clim <-
 df_clim 
 ```
 
-# Pre-processing
+## Pre-processing
 
 Now, with the climate data loaded we can start running the pre-processing procedures. The `solarCalcISO52010` package is used to calculate solar irradiance on horizontal and vertical surfaces, typical sub-urban shading factors are estimated as well typical reduction from window blinds usage. 
 
@@ -103,7 +104,7 @@ mat_h_se <- df %>%
   as.matrix()
 ```
 
-# Running the simulation
+## Running the simulation
 
 The actual RC-network construction and simulation procedures are written in Stan, found in the 'src/stan_files/chunks/ISO52016.stan' file. Here it's parsed into C++, compiled and exposed as a R-callable function called `ISO14N()`:
 
@@ -179,7 +180,7 @@ df2 %>%
 ```
 
 
-# References
+## References
 
 1. Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. "Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings — A Case Study in Nordic Climate". Energies 12 (3).  https://doi.org/10.3390/en12030485
 
