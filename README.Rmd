@@ -49,8 +49,8 @@ source("R/pre_processing.R")
 source("R/helpers.R")
 #Rcpp::sourceCpp("src/calc_Trad_s.cpp")
 ```
-(update: sources function from Stan instead of Rcpp)
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+(update: source function from Stan instead of Rcpp)
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 expose_stan_functions(stanc(model_code=paste0("functions {\n", read_file("src/stan_files/chunks/common_functions.stan"), "}\ndata{} \nparameters{}\nmodel{}")))
 ```
 

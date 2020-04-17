@@ -58,7 +58,12 @@ source("R/helpers.R")
 #Rcpp::sourceCpp("src/calc_Trad_s.cpp")
 ```
 
-(update: sources function from Stan instead of Rcpp)
+(update: source function from Stan instead of
+Rcpp)
+
+``` r
+expose_stan_functions(stanc(model_code=paste0("functions {\n", read_file("src/stan_files/chunks/common_functions.stan"), "}\ndata{} \nparameters{}\nmodel{}")))
+```
 
 The “test\_building.R” holds a data frame with parameters describing the
 test building used in the paper
