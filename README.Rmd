@@ -40,14 +40,18 @@ The procedures to calculate solar irradiance on a surface with arbitrary orienta
 ```{r}
 devtools::install_github("lukas-rokka/solarCalcISO52010")
 ```
-Now, load the `solarCalcISO52010` and source needed R and C++ functions:
+Now, load the `solarCalcISO52010` and source needed R functions:
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 library(solarCalcISO52010)
 source("R/test_building.R")
 source("R/pre_processing.R")
 source("R/helpers.R")
-Rcpp::sourceCpp("src/calc_Trad_s.cpp")
+#Rcpp::sourceCpp("src/calc_Trad_s.cpp")
+```
+(update: sources function from Stan instead of Rcpp)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+expose_stan_functions(stanc(model_code=paste0("functions {\n", read_file("src/stan_files/chunks/common_functions.stan"), "}\ndata{} \nparameters{}\nmodel{}")))
 ```
 
 The "test_building.R" holds a data frame with parameters describing the test building used in the paper [\[1\]][1], "pre_processing.R" holds the pre-processing procedures and "helpers.R" holds some additional functions. 
@@ -86,7 +90,7 @@ Heat transfer coefficients for weather exposed exterior surfaces depends on the 
 df <- df_clim %>%
   mutate(
     U10_idx = ceiling(p$U10_idx_N*((U10)/(max(U10)))),  # wind speed indices
-    T_hyd_s = calc_Trad_s(T_e, p$xy[[1]]),     # supply temp radiators, intepolation from look-up table 
+    T_hyd_s = calc_T_hyd_s(T_e, p$xy[[1]][,1], p$xy[[1]][,2]),     # supply temp radiators, intepolation from look-up table 
     P_gn_int= 3,                               # internal heat gains
     P_gn_sol= g_bl*p$g_gl*p$r_si[[1]][3]*I_tot_ver_sh, # solar heat gains, eq 27 in [1]
     #Ev_sol  = p$Kv_sol*P_gn_sol,              # Illuminance natural light
@@ -187,6 +191,6 @@ df2 %>%
 2. ISO 52016-1:2017. "Energy Performance of Buildings - Energy Needs for Heating and Cooling, Internal Temperatures and Sensible and Latent Heat Loads - Part 1 Calculation Procedures." https://www.iso.org/standard/65696.html
 
 
-[1]: https://doi.org/10.3390/en12030485 "Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings — A Case Study in Nordic Climate. Energies 12 (3)."
+[1]: https://doi.org/10.3390/en12030485 "Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings -- A Case Study in Nordic Climate. Energies 12 (3)."
 
-[2]: https://www.iso.org/standard/65696.html "Energy Performance of Buildings - Energy Needs for Heating and Cooling, Internal Temperatures and Sensible and Latent Heat Loads - Part 1 Calculation Procedures (ISO 52016-1:2017)."
+[2]: https://www.iso.org/standard/65696.html "Energy Performance of Buildings -- Energy Needs for Heating and Cooling, Internal Temperatures and Sensible and Latent Heat Loads - Part 1 Calculation Procedures (ISO 52016-1:2017)."

@@ -7,14 +7,14 @@ Lukas Lundström
 
 This respiratory holds code for calculating space heating use according
 to the ISO14N modelling framework presented in the paper
-[\[1\]](https://doi.org/10.3390/en12030485 "Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings — A Case Study in Nordic Climate. Energies 12 (3).").
+[\[1\]](https://doi.org/10.3390/en12030485 "Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings -- A Case Study in Nordic Climate. Energies 12 (3).").
 Includes code to construct the thermal network, running the simulation,
 modelling a hydronic radiator heating system, satellite-based solar
 irradiance, shading, window blinds, wind- and stack-driven air leakage,
 and variable exterior surface heat transfer coefficients. The thermal
 network is a 14 node lumped and simplified version of the ISO
 52016-1:2017 standard
-[\[2\]](https://www.iso.org/standard/65696.html "Energy Performance of Buildings - Energy Needs for Heating and Cooling, Internal Temperatures and Sensible and Latent Heat Loads - Part 1 Calculation Procedures (ISO 52016-1:2017)."),
+[\[2\]](https://www.iso.org/standard/65696.html "Energy Performance of Buildings -- Energy Needs for Heating and Cooling, Internal Temperatures and Sensible and Latent Heat Loads - Part 1 Calculation Procedures (ISO 52016-1:2017)."),
 as illustrated in the figure bellow. Also 20 node version is included,
 where opaque building elements are splitted into 5 planes.
 
@@ -44,23 +44,25 @@ to install it.
 
 ``` r
 devtools::install_github("lukas-rokka/solarCalcISO52010")
-#> Skipping install of 'solarCalcISO52010' from a github remote, the SHA1 (defff689) has not changed since last install.
+#> Skipping install of 'solarCalcISO52010' from a github remote, the SHA1 (26d5a8bb) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
-Now, load the `solarCalcISO52010` and source needed R and C++ functions:
+Now, load the `solarCalcISO52010` and source needed R functions:
 
 ``` r
 library(solarCalcISO52010)
 source("R/test_building.R")
 source("R/pre_processing.R")
 source("R/helpers.R")
-Rcpp::sourceCpp("src/calc_Trad_s.cpp")
+#Rcpp::sourceCpp("src/calc_Trad_s.cpp")
 ```
+
+(update: sources function from Stan instead of Rcpp)
 
 The “test\_building.R” holds a data frame with parameters describing the
 test building used in the paper
-[\[1\]](https://doi.org/10.3390/en12030485 "Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings — A Case Study in Nordic Climate. Energies 12 (3)."),
+[\[1\]](https://doi.org/10.3390/en12030485 "Lundström, Lukas, Jan Akander, and Jesús Zambrano. 2019. Development of a Space Heating Model Suitable for the Automated Model Generation of Existing Multifamily Buildings -- A Case Study in Nordic Climate. Energies 12 (3)."),
 “pre\_processing.R” holds the pre-processing procedures and “helpers.R”
 holds some additional functions.
 
@@ -81,6 +83,18 @@ df_clim <-
   read_rds("inst/extdata/df_clim.rds") %>%
   filter(between(timestamp, ymd_h(2016010100), ymd_h(2016123123))) %>%
   change_interval("hour")
+#> Warning: funs() is soft deprecated as of dplyr 0.8.0
+#> Please use a list of either functions or lambdas: 
+#> 
+#>   # Simple named list: 
+#>   list(mean = mean, median = median)
+#> 
+#>   # Auto named with `tibble::lst()`: 
+#>   tibble::lst(mean, median)
+#> 
+#>   # Using lambdas
+#>   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+#> This warning is displayed once per session.
 df_clim 
 #> # A tibble: 8,784 x 14
 #>    timestamp             G_dir G_dif   GHI I_str I_strd albedo     T_e
@@ -133,7 +147,7 @@ given as a constant of 0,35 l/(s\*m2).
 df <- df_clim %>%
   mutate(
     U10_idx = ceiling(p$U10_idx_N*((U10)/(max(U10)))),  # wind speed indices
-    T_hyd_s = calc_Trad_s(T_e, p$xy[[1]]),     # supply temp radiators, intepolation from look-up table 
+    T_hyd_s = calc_T_hyd_s(T_e, p$xy[[1]][,1], p$xy[[1]][,2]),     # supply temp radiators, intepolation from look-up table 
     P_gn_int= 3,                               # internal heat gains
     P_gn_sol= g_bl*p$g_gl*p$r_si[[1]][3]*I_tot_ver_sh, # solar heat gains, eq 27 in [1]
     #Ev_sol  = p$Kv_sol*P_gn_sol,              # Illuminance natural light
@@ -223,7 +237,7 @@ df2 %>%
   geom_line()
 ```
 
-<img src="inst/img/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+<img src="inst/img/README-unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 Here’s a plot from a short spring sample period, this time including
 global horizontal irradiance (GHI). The impact of solar heat gains and
@@ -240,7 +254,7 @@ df2 %>%
   geom_line()
 ```
 
-<img src="inst/img/README-unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
+<img src="inst/img/README-unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
 
 ## References
 
